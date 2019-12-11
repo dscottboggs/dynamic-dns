@@ -1,0 +1,7 @@
+[Unit]
+Description=Check for new DNS records or changes in IP and fix them in DigitalOcean
+
+[Service]
+ExecStop=true
+ExecStart=/usr/bin/dynamic_dns
+Type=oneshot
