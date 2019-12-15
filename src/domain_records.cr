@@ -1,7 +1,9 @@
 require "uri"
+require "./helper"
 
 # The response returned from DigitalOcean when requesting a list of all domain records.
 class DomainRecords
+  extend Helper
   include JSON::Serializable
   property domain_records : Set(IncomingDomainRecord)
   property links : Links?
@@ -28,12 +30,12 @@ class DomainRecords
     {"tams.tech", "madscientists.co"}.each do |host|
       link = "/v2/domains/" + host + "/records"
       until link.nil?
-        resp = client.get link
-        break handle_DO_error resp unless resp.success?
+        response = client.get link
+        break handle_DO_error response unless response.success?
         records = begin
-          self.from_json resp.body
+          self.from_json response.body
         rescue e : JSON::MappingError
-          LOG.fatal "error parsing the following JSON:\n", JSON.parse(resp.body).to_pretty_json
+          Helper::LOG.fatal "error parsing the following JSON:\n", JSON.parse(response.body).to_pretty_json
           raise e
         end
         all[host] = all[host]? || new

@@ -51,7 +51,7 @@ struct OutgoingDomainRecord
                  @tag = nil)
   end
 
-  def self.new_A_record(subdomain, ip_address, ttl = DEFAULT_TTL)
+  def self.new_A_record(subdomain : String, ip_address : String, ttl = DEFAULT_TTL)
     new type: "A",
       name: subdomain,
       data: ip_address,
