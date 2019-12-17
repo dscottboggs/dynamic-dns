@@ -1,0 +1,7 @@
+version: '3.0'
+
+services:
+  test-server:
+    image: nginx
+    labels:
+      tech.tams.dns_hosts: fake.tams.tech

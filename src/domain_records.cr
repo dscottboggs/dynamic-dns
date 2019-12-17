@@ -29,10 +29,11 @@ class DomainRecords
       link = "/v2/domains/" + host + "/records"
       until link.nil?
         resp = client.get link
+        break handle_DO_error resp unless resp.success?
         records = begin
           self.from_json resp.body
         rescue e : JSON::MappingError
-          puts "error parsing the following JSON:\n", JSON.parse(resp.body).to_pretty_json
+          LOG.fatal "error parsing the following JSON:\n", JSON.parse(resp.body).to_pretty_json
           raise e
         end
         all[host] = all[host]? || new

@@ -1,5 +1,7 @@
 require "json"
 
+DEFAULT_TTL = 600_i64
+
 module DomainRecord
   macro included
     property type : String
@@ -14,11 +16,20 @@ module DomainRecord
   end
 end
 
+@[JSON::Serializable::Options(emit_nulls: true)]
 struct IncomingDomainRecord
   include JSON::Serializable
   include DomainRecord
 
   property id : Int32
+
+  def initialize(@id, @type, @name, @data, @ttl,
+                 @priority = nil,
+                 @port = nil,
+                 @weight = nil,
+                 @flags = nil,
+                 @tag = nil)
+  end
 
   def to_outgoing : OutgoingDomainRecord
     OutgoingDomainRecord.new({% for ivar in @type.instance_vars %}
@@ -27,7 +38,23 @@ struct IncomingDomainRecord
   end
 end
 
+@[JSON::Serializable::Options(emit_nulls: true)]
 struct OutgoingDomainRecord
   include JSON::Serializable
   include DomainRecord
+
+  def initialize(@type, @name, @data, @ttl,
+                 @priority = nil,
+                 @port = nil,
+                 @weight = nil,
+                 @flags = nil,
+                 @tag = nil)
+  end
+
+  def self.new_A_record(subdomain, ip_address, ttl = DEFAULT_TTL)
+    new type: "A",
+      name: subdomain,
+      data: ip_address,
+      ttl: ttl
+  end
 end
