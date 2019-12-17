@@ -19,8 +19,11 @@ module DynamicDNS
   include Helper
   LOG.info "NEW INSTANCE"
 
-  DO_AUTH_KEY = File.read "#{File.dirname __DIR__}/do.auth.key"
+  CONFDIR = ENV["confdir"]?.try { |var| Path.new var } || (os_config_dir / "do-dynamic-dns")
 
-  DEFAULT_CONFIG_LOC = Path[__DIR__, "do-dynamic-dns.json"]
-  class_property config : Config { Config.load from: DEFAULT_CONFIG_LOC }
+  DO_AUTH_KEY = File.read "#{CONFDIR}/do.auth.key"
+
+  private def self.os_config_dir
+    Path[ENV.fetch("XDG_CONFIG_HOME", default: Path.home.to_s), ".config"]
+  end
 end
