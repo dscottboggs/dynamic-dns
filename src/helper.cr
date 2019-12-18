@@ -1,5 +1,7 @@
 module Helper
-  LOG = Logger.new(
+  IP_CHECK_ADDRESS = ENV["IP_CHECK_ADDRESS"]? || "https://am.i.mullvad.net/ip"
+  CURRENT_IP       = HTTP::Client.get(IP_CHECK_ADDRESS).body.strip
+  LOG              = Logger.new(
     io: if logfile = ENV["logfile"]?
       file = File.new logfile, mode: "a+"
       at_exit { LOG.try &.close }
@@ -13,8 +15,6 @@ module Helper
       Logger::Severity::WARN
     end
   )
-
-  CURRENT_IP = HTTP::Client.get("https://am.i.mullvad.net/ip").body.strip
 
   struct ErrorResponse
     include JSON::Serializable

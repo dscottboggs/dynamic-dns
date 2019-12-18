@@ -17,7 +17,7 @@ require "./helper"
 
 module DynamicDNS
   include Helper
-  LOG.info "NEW INSTANCE"
+  LOG.debug "NEW INSTANCE"
 
   CONFDIR = ENV["confdir"]?.try { |var| Path.new var } || (os_config_dir / "do-dynamic-dns")
 
