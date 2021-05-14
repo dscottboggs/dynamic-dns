@@ -3,11 +3,13 @@
 # Uses labels to associate services with a hostname on the current system
 
 # STDLIB
-require "logger"
+
 # STDLIB monkey-patches
-require "./core_ext/http_client"
+require "./core_ext/log"
+
 # External shards
-require "docker"
+require "xdg"
+
 # Local Files
 require "./domain_record"
 require "./domain_records"
@@ -17,13 +19,7 @@ require "./helper"
 
 module DynamicDNS
   include Helper
-  LOG.debug "NEW INSTANCE"
 
-  CONFDIR = ENV["confdir"]?.try { |var| Path.new var } || (os_config_dir / "do-dynamic-dns")
-
-  DO_AUTH_KEY = File.read "#{CONFDIR}/do.auth.key"
-
-  private def self.os_config_dir
-    Path[ENV.fetch("XDG_CONFIG_HOME", default: Path.home.to_s), ".config"]
-  end
+  CONFDIR = ENV["confdir"]?.try { |var| Path.new var } || (XDG::CONFIG::HOME / "dynamic-dns")
+  CONFIG  = Config.load from: CONFDIR / "config.json"
 end

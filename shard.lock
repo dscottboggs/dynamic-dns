@@ -1,6 +1,14 @@
-version: 1.0
+version: 2.0
 shards:
   docker:
-    github: jeromegn/docker.cr
+    git: https://github.com/jeromegn/docker.cr.git
     version: 0.1.2
+
+  docr:
+    git: https://github.com/marghidanu/docr.git
+    version: 0.1.0+git.commit.578c3c6f9e9d96bc0bfa28807a009a21d19dd9d8
+
+  xdg:
+    git: https://github.com/dscottboggs/xdg.cr.git
+    version: 0.1.0+git.commit.8e4f98773a8d10801c66db317f9f193dae291a32
 

@@ -1,17 +1,17 @@
 name: dynamic_dns
-version: 0.1.0
+version: 0.2.0
 
 authors:
   - Scott Boggs <scott@tams.tech>
 
 dependencies:
-  docker:
-    github: jeromegn/docker.cr
+  xdg:
+    github: dscottboggs/xdg.cr
 
 targets:
   dynamic_dns:
-    main: src/dynamic_dns.cr
+    main: src/run.cr
 
-crystal: 0.30.1
+crystal: 1.0.0
 
 license: MIT

@@ -1,19 +1,34 @@
 # dynamic_dns
-A dynamic DNS solution for Docker and DigitalOcean.
+
+A highly opinionated dynamic DNS solution. Ideal for self-hosters, small business, or other small-to-medium sized deployments. I use it on my home server for my personal services as well as a VPS for more public-facing services (I don't have great upload speeds).
+
+## Features
+
+- Subdomain discovery from Docker container labels
+- Integration with DigitalOcean
+- Structured Logging (ideal for monitoring and alerting)
+- SystemD integration (some manual setup required for now)
+
+### Things I don't plan to add (but would accept a PR for)
+
+- Integration with other dynamic DNS services
+- Support for other methods of rule discovery
+
+### Non-goals
+
+- support for swarms, clusters, or however you want to call multi-server deployments. My use case is well-suited to a few single servers which each host a few services separately from each other, so the added complexity is not worth it to me.
+
+## Usage
 
 Rules are defined with a docker label on a relevant container. For example, my ethercalc deployment right now uses the following configuration in it's docker-compose.yml
 
 ```yaml
-version: '2.0'
+version: "2.0"
 services:
   ethercalc:
     # ... other options ...
     labels:
-      traefik.enable: "true"
-      traefik.http.routers.ethercalc.tls: 'true'
-      traefik.http.routers.ethercalc.tls.certresolver: letsencrypt
-      traefik.http.routers.ethercalc.rule: Host(`sheets.tams.tech`,`sheets.madscientists.co`,`sht.tams.tech`)
-      traefik.http.services.ethercalc.loadbalancer.server.port: 8000
+      # ... other labels ...
       tech.tams.dns_hosts: sheets.tams.tech sheets.madscientists.co sht.tams.tech
     # ... other options ...
 ```
@@ -22,12 +37,24 @@ By simply labelling the container with the whitespace-separated list of domains 
 the service will automatically have Digital Ocean point those domains at your IP address.
 
 ## Installation
-#### Configuration
- - Put your digital ocean OAuth key in a file with nothing else in it at `~/.config/do-dynamic-dns/do.auth.key`.
- - Copy the dynamic-dns.service and dynamic-dns.timer files to `/etc/systemd/system` and run
-   `systemctl enable dynamic-dns` to install the service to run periodically
 
-#### Installation from a binary
+### Configuration
+
+- Get a [DigitalOcean API key](https://cloud.digitalocean.com/account/api/tokens) with Read and Write access.
+- Create a config file in `$XDG_CONFIG_HOME/dynamic-dns/config.json`:
+
+```json
+{
+  "auth_key": "your DigitalOcean API key",
+  "domains": ["tams.tech"]
+}
+```
+
+- Copy the dynamic-dns.service and dynamic-dns.timer files to `/etc/systemd/system` and run
+  `systemctl enable dynamic-dns` to install the service to run periodically
+
+### Installation from a binary
+
 Download the binary and place it on your path, for example:
 
 ```sh
@@ -36,11 +63,17 @@ sudo mv dynamic-dns /usr/local/bin
 ```
 
 #### Installation from source
+
 Clone the repository and run the following commands from the project directory to compile it and install:
+
 ```sh
-crystal build -odynamic-dns --release src/run.cr
-sudo mv dynamic-dns /usr/local/bin
+shards build --production --release
+sudo mv bin/dynamic_dns /usr/local/bin
 ```
+
+## Running manually after changes
+
+If you know you've made some changes recently and want to force an update, just run `systemctl start dynamic-dns`.
 
 ## Contributing
 
